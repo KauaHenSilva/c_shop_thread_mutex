@@ -6,9 +6,11 @@ typedef struct repositores Repositores;
 
 void *run_client(void *positionCliente);
 void *run_Repositore(void *positionRepostor);
+void *run_verificarMercado(void *arq);
 
-void runTreadCliente();
-void runTreadRepositor();
+void runThreadCliente();
+void runThreadRepositor();
+void runThreadVerificarMercado();
 
 void exit_client();
 void exit_repositore();

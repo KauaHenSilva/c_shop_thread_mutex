@@ -130,7 +130,30 @@ void *run_Repositore(void *positionRepostor)
   return NULL;
 }
 
-void runTreadCliente()
+void *run_verificarMercado(void *arq)
+{
+  (void)arq;
+  while (1)
+  {
+    int vazio = 0;
+    pthread_mutex_lock(&product);
+    for (int x = 0; x < QTDPRODUTO; x++)
+    {
+      if (produto[x].qtdProduto == 0)
+        vazio++;
+    }
+    pthread_mutex_unlock(&product);
+    if (vazio == QTDPRODUTO)
+    {
+      printf("ESTAMOS SEM PRODUTOS!!!\n");
+      sleep(20);
+    }
+  }
+  return NULL;
+}
+
+
+void runThreadCliente()
 {
   for (int x = 0; x < QTDCLIENTE; x++)
   {
@@ -142,7 +165,7 @@ void runTreadCliente()
   }
 }
 
-void runTreadRepositor()
+void runThreadRepositor()
 {
   for (int x = 0; x < QTDREPOSITOR; x++)
   {
@@ -150,6 +173,18 @@ void runTreadRepositor()
     *aux = x;
 
     if (pthread_create(&repositores[x].thread, NULL, &run_Repositore, (void *)aux) != 0)
+      perror("Erro a criar");
+  }
+}
+
+void runThreadVerificarMercado()
+{
+  for (int x = 0; x < QTDCLIENTE; x++)
+  {
+    int *aux = (int *)malloc(sizeof(int));
+    *aux = x;
+
+    if (pthread_create(&cliente[x].thread, NULL, &run_client, (void *)aux) != 0)
       perror("Erro a criar");
   }
 }

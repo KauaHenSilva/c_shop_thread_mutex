@@ -34,27 +34,6 @@
 #include "defincoes/definicoes.c"
 #include "threads/threads.c"
 
-void *verificarMercado(void *arq)
-{
-  (void)arq;
-  while (1)
-  {
-    int vazio = 0;
-    pthread_mutex_lock(&product);
-    for (int x = 0; x < QTDPRODUTO; x++)
-    {
-      if (produto[x].qtdProduto == 0)
-        vazio++;
-    }
-    pthread_mutex_unlock(&product);
-    if (vazio == QTDPRODUTO)
-    {
-      printf("ESTAMOS SEM PRODUTOS!!!\n");
-      sleep(20);
-    }
-  }
-  return NULL;
-}
 
 int main()
 {
@@ -66,9 +45,7 @@ int main()
 
   runTreadCliente();
   runTreadRepositor();
-
-  pthread_t threadVerificacao;
-  pthread_create(&threadVerificacao, NULL, &verificarMercado, NULL);
+  runThreadVerificarMercado();
 
   exit_client();
   exit_repositore();
