@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifndef TEMPO_MEDIO_DE_UMA_COMPRA
+#define TEMPO_MEDIO_DE_UMA_COMPRA 0
+#endif
+
+#if !defined(TEMPO_MEDIO_DE_UMA_REPOSCAO)
+#define TEMPO_MEDIO_DE_UMA_REPOSCAO 0
+#endif
+
 #ifndef QTDPRODUTO
 #define QTDPRODUTO 30
 #endif
@@ -11,8 +19,8 @@
 #define QTDCLIENTE 10
 #endif
 
-#ifndef QTDREPOSITORIO
-#define QTDREPOSITORIO 10
+#ifndef QTDREPOSITOR
+#define QTDREPOSITOR 10
 #endif
 
 #if !defined(STRUCTPRODUTOCLIENTEREPOSITORIO)
@@ -53,9 +61,9 @@ void *run_client(void *positionCliente)
   int *idCliente = (int *)positionCliente;
 
   int idxProduto;
-  int qtdCompras = rand() % 100 + 1;
+  int qtdCompras = 10000;
 
-  while (qtdCompras--)
+  while (qtdCompras)
   {
     idxProduto = rand() % QTDPRODUTO;
 
@@ -64,16 +72,17 @@ void *run_client(void *positionCliente)
     if (produto[idxProduto].qtdProduto > 0)
     {
       produto[idxProduto].qtdProduto--;
-      printf("O cliente %d, ", cliente[*idCliente].id);
-      printf("comprou o produto %d, ", produto[idxProduto].idProduto);
-      printf("sobrou %d. \n", produto[idxProduto].qtdProduto);
+      printf("O cliente %02d, ", cliente[*idCliente].id);
+      printf("comprou o produto %02d, ", produto[idxProduto].idProduto);
+      printf("sobrou %02d. \n", produto[idxProduto].qtdProduto);
     }
 
     pthread_mutex_unlock(&product);
-    sleep(rand() % 1 + 1);
+    qtdCompras--;
+    sleep(rand() % (TEMPO_MEDIO_DE_UMA_COMPRA + 1));
   }
 
-  printf("O cliente %d, arrasta para cima!\n", cliente[*idCliente].id);
+  printf("O cliente %2d, arrasta para cima!\n", cliente[*idCliente].id);
 
   free(idCliente);
   return NULL;
@@ -85,9 +94,9 @@ void *run_Repositore(void *positionRepostor)
   int qtdRepor;
   int idxProduto;
 
-  int qtdReposicao = 1000;
+  int qtdReposicao = 10000;
 
-  while (qtdReposicao--)
+  while (qtdReposicao)
   {
     idxProduto = rand() % QTDPRODUTO;
     qtdRepor = rand() % QTDPRODUTO + 1;
@@ -97,15 +106,15 @@ void *run_Repositore(void *positionRepostor)
     if (produto[idxProduto].qtdProduto == 0)
     {
       produto[idxProduto].qtdProduto += qtdRepor;
-      printf("O Repositorio %d, ", repositores[*idRepositor].id);
-      printf("repôs %d item ", qtdRepor);
-      printf("no produto %d. \n", produto[idxProduto].idProduto);
-      sleep(rand() % 10);
+      printf("O Repistor nmr %02d, ", repositores[*idRepositor].id);
+      printf("repos %02d item ", qtdRepor);
+      printf("do produto %02d. \n", produto[idxProduto].idProduto);
     }
 
     pthread_mutex_unlock(&product);
 
-    sleep(rand() % 2);
+    qtdReposicao--;
+    sleep(rand() % (TEMPO_MEDIO_DE_UMA_COMPRA + 1));
   }
 
   return NULL;
@@ -125,7 +134,7 @@ void runTreadCliente()
 
 void runTreadRepositor()
 {
-  for (int x = 0; x < QTDREPOSITORIO; x++)
+  for (int x = 0; x < QTDREPOSITOR; x++)
   {
     int *aux = (int *)malloc(sizeof(int));
     *aux = x;
@@ -144,7 +153,7 @@ void exit_client()
 
 void exit_repositore()
 {
-  for (int x = 0; x < QTDREPOSITORIO; x++)
+  for (int x = 0; x < QTDREPOSITOR; x++)
     if (pthread_join(repositores[x].thread, NULL) != 0)
       perror("Erro ao esperar");
 }

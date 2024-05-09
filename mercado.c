@@ -3,16 +3,24 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#ifndef TEMPO_MEDIO_DE_UMA_COMPRA
+#define TEMPO_MEDIO_DE_UMA_COMPRA 1
+#endif
+
+#if !defined(TEMPO_MEDIO_DE_UMA_REPOSCAO)
+#define TEMPO_MEDIO_DE_UMA_REPOSCAO 1
+#endif
+
 #ifndef QTDPRODUTO
-#define QTDPRODUTO 30
+#define QTDPRODUTO 5
 #endif
 
 #ifndef QTDCLIENTE
-#define QTDCLIENTE 10
+#define QTDCLIENTE 3
 #endif
 
-#ifndef QTDREPOSITORIO
-#define QTDREPOSITORIO 10
+#ifndef QTDREPOSITOR
+#define QTDREPOSITOR 1
 #endif
 
 #include "defincoes/definicoes.c"

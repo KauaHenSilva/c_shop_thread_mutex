@@ -9,8 +9,8 @@
 #define QTDCLIENTE 10
 #endif
 
-#ifndef QTDREPOSITORIO
-#define QTDREPOSITORIO 10
+#ifndef QTDREPOSITOR
+#define QTDREPOSITOR 10
 #endif
 
 #if !defined(STRUCTPRODUTOCLIENTEREPOSITORIO)
@@ -69,8 +69,8 @@ void defCliente()
 
 void defRepositores()
 {
-repositores = (Repositores *)realloc(repositores, sizeof(Repositores) * QTDREPOSITORIO);
-  for (int x = 0; x < QTDREPOSITORIO; x++)
+  repositores = (Repositores *)realloc(repositores, sizeof(Repositores) * QTDREPOSITOR);
+  for (int x = 0; x < QTDREPOSITOR; x++)
     repositores[x].id = ++idRepositores;
 }
 
