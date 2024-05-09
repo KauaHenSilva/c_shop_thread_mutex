@@ -13,6 +13,11 @@
 #define QTDREPOSITOR 10
 #endif
 
+
+#ifndef QUANTIDADE_INICIAL_REPOSICAO
+#define QUANTIDADE_INICIAL_REPOSICAO 5
+#endif
+
 #if !defined(STRUCTPRODUTOCLIENTEREPOSITORIO)
 #define STRUCTPRODUTOCLIENTEREPOSITORIO
 
@@ -56,7 +61,7 @@ void defProdutos()
   for (int x = 0; x < QTDPRODUTO; x++)
   {
     produto[x].idProduto = ++idProduto;
-    produto[x].qtdProduto = rand() % QTDPRODUTO + 1;
+    produto[x].qtdProduto = QUANTIDADE_INICIAL_REPOSICAO;
   }
 }
 

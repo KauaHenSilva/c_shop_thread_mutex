@@ -11,6 +11,10 @@
 #define TEMPO_MEDIO_DE_UMA_REPOSCAO 0
 #endif
 
+#ifndef QUANTIDADE_POR_REPOSICAO
+#define QUANTIDADE_POR_REPOSICAO 10
+#endif
+
 #ifndef QTDPRODUTO
 #define QTDPRODUTO 30
 #endif
@@ -76,10 +80,16 @@ void *run_client(void *positionCliente)
       printf("comprou o produto %02d, ", produto[idxProduto].idProduto);
       printf("sobrou %02d. \n", produto[idxProduto].qtdProduto);
     }
+    else
+    {
+      printf("O cliente %02d, ", cliente[*idCliente].id);
+      printf("comprou o produto %02d, ", produto[idxProduto].idProduto);
+      printf("sobrou %02d. (FALHA)\n", produto[idxProduto].qtdProduto);
+    }
 
     pthread_mutex_unlock(&product);
     qtdCompras--;
-    sleep(rand() % (TEMPO_MEDIO_DE_UMA_COMPRA + 1));
+    sleep(TEMPO_MEDIO_DE_UMA_COMPRA);
   }
 
   printf("O cliente %2d, arrasta para cima!\n", cliente[*idCliente].id);
@@ -91,30 +101,30 @@ void *run_client(void *positionCliente)
 void *run_Repositore(void *positionRepostor)
 {
   int *idRepositor = (int *)positionRepostor;
-  int qtdRepor;
+  int qtdReposicao = 1000000;
+
   int idxProduto;
-
-  int qtdReposicao = 10000;
-
   while (qtdReposicao)
   {
     idxProduto = rand() % QTDPRODUTO;
-    qtdRepor = rand() % QTDPRODUTO + 1;
 
     pthread_mutex_lock(&product);
 
-    if (produto[idxProduto].qtdProduto == 0)
+    if (produto[idxProduto].qtdProduto < QUANTIDADE_POR_REPOSICAO)
     {
-      produto[idxProduto].qtdProduto += qtdRepor;
+      produto[idxProduto].qtdProduto += QUANTIDADE_POR_REPOSICAO;
       printf("O Repistor nmr %02d, ", repositores[*idRepositor].id);
-      printf("repos %02d item ", qtdRepor);
+      printf("repos %02d item ", QUANTIDADE_POR_REPOSICAO);
       printf("do produto %02d. \n", produto[idxProduto].idProduto);
+
+      pthread_mutex_unlock(&product);
+      sleep(TEMPO_MEDIO_DE_UMA_REPOSCAO);
+      qtdReposicao--;
+
+      continue;
     }
 
     pthread_mutex_unlock(&product);
-
-    qtdReposicao--;
-    sleep(rand() % (TEMPO_MEDIO_DE_UMA_COMPRA + 1));
   }
 
   return NULL;
