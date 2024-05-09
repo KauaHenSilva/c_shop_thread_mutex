@@ -1,5 +1,6 @@
 #include "definicoes.h"
 #include <pthread.h>
+#include <unistd.h>
 
 #ifndef QTDPRODUTO
 #define QTDPRODUTO 30
@@ -13,7 +14,6 @@
 #define QTDREPOSITOR 10
 #endif
 
-
 #ifndef QUANTIDADE_INICIAL_REPOSICAO
 #define QUANTIDADE_INICIAL_REPOSICAO 5
 #endif
@@ -25,6 +25,7 @@ struct produto
 {
   int idProduto;
   int qtdProduto;
+  pthread_mutex_t product;
 };
 
 struct cliente
@@ -44,7 +45,6 @@ struct repositores
 #if !defined(VARGLOBALPRODUTOCLIENTEREPOSITORIO)
 #define VARGLOBALPRODUTOCLIENTEREPOSITORIO
 
-pthread_mutex_t product;
 Produto *produto;
 Cliente *cliente;
 Repositores *repositores;
@@ -62,6 +62,7 @@ void defProdutos()
   {
     produto[x].idProduto = ++idProduto;
     produto[x].qtdProduto = QUANTIDADE_INICIAL_REPOSICAO;
+    pthread_mutex_init(&produto[x].product, NULL);
   }
 }
 
@@ -81,6 +82,8 @@ void defRepositores()
 
 void freeProdutos()
 {
+  for(int x = 0 ; x < QTDPRODUTO ; x++)
+    pthread_mutex_destroy(&produto[x].product);
   free(produto);
 }
 

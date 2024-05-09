@@ -11,6 +11,3 @@ void *run_verificarMercado(void *arq);
 void runThreadCliente();
 void runThreadRepositor();
 void runThreadVerificarMercado();
-
-void exit_client();
-void exit_repositore();
