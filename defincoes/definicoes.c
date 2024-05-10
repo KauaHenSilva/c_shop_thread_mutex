@@ -1,5 +1,6 @@
 #include "definicoes.h"
 #include <pthread.h>
+#include <unistd.h>
 
 #ifndef QTDPRODUTO
 #define QTDPRODUTO 30
@@ -9,8 +10,12 @@
 #define QTDCLIENTE 10
 #endif
 
-#ifndef QTDREPOSITORIO
-#define QTDREPOSITORIO 10
+#ifndef QTDREPOSITOR
+#define QTDREPOSITOR 10
+#endif
+
+#ifndef QUANTIDADE_INICIAL_REPOSICAO
+#define QUANTIDADE_INICIAL_REPOSICAO 5
 #endif
 
 #if !defined(STRUCTPRODUTOCLIENTEREPOSITORIO)
@@ -20,6 +25,7 @@ struct produto
 {
   int idProduto;
   int qtdProduto;
+  pthread_mutex_t product;
 };
 
 struct cliente
@@ -39,7 +45,6 @@ struct repositores
 #if !defined(VARGLOBALPRODUTOCLIENTEREPOSITORIO)
 #define VARGLOBALPRODUTOCLIENTEREPOSITORIO
 
-pthread_mutex_t product;
 Produto *produto;
 Cliente *cliente;
 Repositores *repositores;
@@ -56,7 +61,8 @@ void defProdutos()
   for (int x = 0; x < QTDPRODUTO; x++)
   {
     produto[x].idProduto = ++idProduto;
-    produto[x].qtdProduto = rand() % QTDPRODUTO + 1;
+    produto[x].qtdProduto = QUANTIDADE_INICIAL_REPOSICAO;
+    pthread_mutex_init(&produto[x].product, NULL);
   }
 }
 
@@ -69,13 +75,15 @@ void defCliente()
 
 void defRepositores()
 {
-repositores = (Repositores *)realloc(repositores, sizeof(Repositores) * QTDREPOSITORIO);
-  for (int x = 0; x < QTDREPOSITORIO; x++)
+  repositores = (Repositores *)realloc(repositores, sizeof(Repositores) * QTDREPOSITOR);
+  for (int x = 0; x < QTDREPOSITOR; x++)
     repositores[x].id = ++idRepositores;
 }
 
 void freeProdutos()
 {
+  for(int x = 0 ; x < QTDPRODUTO ; x++)
+    pthread_mutex_destroy(&produto[x].product);
   free(produto);
 }
 
