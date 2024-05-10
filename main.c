@@ -49,7 +49,7 @@ int main()
 
   while(1)
     continue;
-  
+
   freeProdutos();
   freeCliente();
   freeRepositores();
