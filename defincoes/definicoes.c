@@ -16,20 +16,17 @@
 #if !defined(STRUCTPRODUTOCLIENTEREPOSITORIO)
 #define STRUCTPRODUTOCLIENTEREPOSITORIO
 
-struct produto
-{
+struct produto{
   int idProduto;
   int qtdProduto;
 };
 
-struct cliente
-{
+struct cliente{
   pthread_t thread;
   int id;
 };
 
-struct repositores
-{
+struct repositores{
   pthread_t thread;
   int id;
 };
@@ -50,41 +47,35 @@ int idProduto = 0;
 int idCliente = 0;
 int idRepositores = 0;
 
-void defProdutos()
-{
+void defProdutos(){
   produto = (Produto *)realloc(produto, sizeof(Produto) * QTDPRODUTO);
-  for (int x = 0; x < QTDPRODUTO; x++)
-  {
+  for (int x = 0; x < QTDPRODUTO; x++){
     produto[x].idProduto = ++idProduto;
     produto[x].qtdProduto = rand() % QTDPRODUTO + 1;
   }
+
 }
 
-void defCliente()
-{
+void defCliente(){
   cliente = (Cliente *)realloc(cliente, sizeof(Cliente) * QTDCLIENTE);
   for (int x = 0; x < QTDCLIENTE; x++)
     cliente[x].id = ++idCliente;
 }
 
-void defRepositores()
-{
-repositores = (Repositores *)realloc(repositores, sizeof(Repositores) * QTDREPOSITORIO);
+void defRepositores(){
+  repositores = (Repositores *)realloc(repositores, sizeof(Repositores) * QTDREPOSITORIO);
   for (int x = 0; x < QTDREPOSITORIO; x++)
     repositores[x].id = ++idRepositores;
 }
 
-void freeProdutos()
-{
+void freeProdutos(){
   free(produto);
 }
 
-void freeCliente()
-{
+void freeCliente(){
   free(cliente);
 }
 
-void freeRepositores()
-{
+void freeRepositores(){
   free(repositores);
 }
