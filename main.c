@@ -36,7 +36,6 @@
 #include "defincoes/definicoes.c"
 #include "threads/threads.c"
 
-
 int main()
 {
   defProdutos();
@@ -47,8 +46,7 @@ int main()
   runThreadRepositor();
   runThreadVerificarMercado();
 
-  while(1)
-    continue;
+  aguardarThreads();
 
   freeProdutos();
   freeCliente();
