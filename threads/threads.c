@@ -58,7 +58,6 @@ struct repositores
   int id;
 };
 
-
 #endif // STRUCTPRODUTOCLIENTEREPOSITORIO
 
 #if !defined(VARGLOBALPRODUTOCLIENTEREPOSITORIO)
@@ -87,7 +86,7 @@ void *run_client(void *positionCliente)
     if (produto[idxProduto].qtdProduto > 0)
     {
       produto[idxProduto].qtdProduto--;
-      
+
       printf("%s, comprou o produto %s, sobrou %02d itens. \n",
              cliente[*idCliente].nome,
              produto[idxProduto].nomeProduto,
@@ -98,9 +97,10 @@ void *run_client(void *positionCliente)
 #ifdef EXIBIR_COMPRAS_FALHAS
     else
     {
-      printf("O cliente %02d, ", cliente[*idCliente].id);
-      printf("comprou o produto %02d, ", produto[idxProduto].idProduto);
-      printf("sobrou %02d. (Falha em comprar, Nao possuia na platileira)\n", produto[idxProduto].qtdProduto);
+      printf("%s, comprou o produto %s, sobrou %02d. (Falha em comprar, Nao possuia na platileira)\n",
+             cliente[*idCliente].nome,
+             produto[idxProduto].nomeProduto,
+             produto[idxProduto].qtdProduto);
     }
 #endif
 

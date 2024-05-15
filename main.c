@@ -60,7 +60,6 @@ int main()
 
   finalizamentoThreads();
 
-
   exibirRelatiorioProdutos();
 
   freeProdutos();
