@@ -14,23 +14,23 @@
 #endif
 
 #ifndef QUANTIDADE_POR_REPOSICAO
-#define QUANTIDADE_POR_REPOSICAO 20
+#define QUANTIDADE_POR_REPOSICAO 5
 #endif
 
 #ifndef QUANTIDADE_INICIAL_REPOSICAO
-#define QUANTIDADE_INICIAL_REPOSICAO 0
+#define QUANTIDADE_INICIAL_REPOSICAO 10
 #endif
 
 #ifndef QTDPRODUTO
-#define QTDPRODUTO 50
+#define QTDPRODUTO 12
 #endif
 
 #ifndef QTDCLIENTE
-#define QTDCLIENTE 10
+#define QTDCLIENTE 7
 #endif
 
 #ifndef QTDREPOSITOR
-#define QTDREPOSITOR 10
+#define QTDREPOSITOR 4
 #endif
 
 #include "defincoes/definicoes.c"
@@ -46,7 +46,7 @@ int main()
   runThreadRepositor();
   runThreadVerificarMercado();
 
-  aguardarThreads();
+  finalizamentoThreads();
 
   freeProdutos();
   freeCliente();

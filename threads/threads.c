@@ -65,20 +65,6 @@ Repositores *repositores;
 
 #endif // VARGLOBALPRODUTOCLIENTEREPOSITORIO
 
-void mutexPrintf(const char *format, ...)
-{
-    // Bloqueia o mutex antes de imprimir
-    pthread_mutex_lock(&print);
-    
-    // Usa a mesma sintaxe de argumentos variáveis como printf
-    va_list args;
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-    
-    // Libera o mutex após a impressão
-    pthread_mutex_unlock(&print);
-}
 void *run_client(void *positionCliente)
 {
   int *idCliente = (int *)positionCliente;
@@ -88,7 +74,6 @@ void *run_client(void *positionCliente)
 
   while (qtdCompras)
   {
-    sleep(TEMPO_MEDIO_DE_UMA_COMPRA);
     idxProduto = rand() % QTDPRODUTO;
 
     pthread_mutex_lock(&produto[idxProduto].product);
@@ -96,24 +81,26 @@ void *run_client(void *positionCliente)
     if (produto[idxProduto].qtdProduto > 0)
     {
       produto[idxProduto].qtdProduto--;
-      mutexPrintf("O cliente %02d, ", cliente[*idCliente].id);
-      mutexPrintf("comprou o produto %02d, ", produto[idxProduto].idProduto);
-      mutexPrintf("sobrou %02d. \n", produto[idxProduto].qtdProduto);
+      printf("%s, comprou o produto %s, sobrou %02d itens. \n",
+             cliente[*idCliente].nome,
+             produto[idxProduto].nomeProduto,
+             produto[idxProduto].qtdProduto);
     }
 #ifdef EXIBIR_COMPRAS_FALHAS
     else
     {
-      mutexPrintf("O cliente %02d, ", cliente[*idCliente].id);
-      mutexPrintf("comprou o produto %02d, ", produto[idxProduto].idProduto);
-      mutexPrintf("sobrou %02d. (Falha em comprar, Nao possuia na platileira)\n", produto[idxProduto].qtdProduto);
+      printf("O cliente %02d, ", cliente[*idCliente].id);
+      printf("comprou o produto %02d, ", produto[idxProduto].idProduto);
+      printf("sobrou %02d. (Falha em comprar, Nao possuia na platileira)\n", produto[idxProduto].qtdProduto);
     }
 #endif
 
     pthread_mutex_unlock(&produto[idxProduto].product);
     qtdCompras--;
+    sleep(TEMPO_MEDIO_DE_UMA_COMPRA);
   }
 
-  mutexPrintf("O cliente %2d, arrasta para cima!\n", cliente[*idCliente].id);
+  printf("%s foi de arrasta para cima!\n", cliente[*idCliente].nome);
 
   free(idCliente);
   return NULL;
@@ -122,31 +109,27 @@ void *run_client(void *positionCliente)
 void *run_Repositore(void *positionRepostor)
 {
   int *idRepositor = (int *)positionRepostor;
-  int qtdReposicao = rand() % 1000000 + 10;
-
   int posicao;
 
-  while (qtdReposicao)
+  while (1)
   {
     posicao = rand() % QTDPRODUTO;
     pthread_mutex_lock(&produto[posicao].product);
 
     if (produto[posicao].qtdProduto < QUANTIDADE_POR_REPOSICAO)
     {
-      sleep(TEMPO_MEDIO_DE_UMA_REPOSCAO);
       produto[posicao].qtdProduto += QUANTIDADE_POR_REPOSICAO;
 
-      mutexPrintf("O Repistor nmr %02d, ", repositores[*idRepositor].id);
-      mutexPrintf("repos %02d item ", QUANTIDADE_POR_REPOSICAO);
-      mutexPrintf("do produto %02d,", produto[posicao].idProduto);
-      mutexPrintf("agora tem %02d. \n", produto[posicao].qtdProduto);
+      printf("O Repistor %s, repos %02d itens do produto %s, agora tem %02d. \n",
+             repositores[*idRepositor].nome,
+             QUANTIDADE_POR_REPOSICAO,
+             produto[posicao].nomeProduto,
+             produto[posicao].qtdProduto);
     }
 
     pthread_mutex_unlock(&produto[posicao].product);
-    --qtdReposicao;
+    sleep(TEMPO_MEDIO_DE_UMA_REPOSCAO);
   }
-
-  mutexPrintf("O Repistor nmr %02d, arrasta para cima!\n", repositores[*idRepositor].id);
 
   return NULL;
 }
@@ -168,11 +151,11 @@ void *run_verificarMercado(void *arg)
 
     if (qtdProduto == 0)
     {
-      mutexPrintf("ESTAMOS SEM PRODUTOS!!!\n");
+      printf("ESTAMOS SEM PRODUTOS!!!\n");
     }
     else
     {
-      mutexPrintf("Possuimos %d produtos nas pratileiras!\n", qtdProduto);
+      printf("Possuimos %d produtos nas pratileiras!\n", qtdProduto);
     }
 
     sleep(20);
@@ -212,11 +195,11 @@ void runThreadVerificarMercado()
     perror("Erro a criar");
 }
 
-void aguardarThreads()
+void finalizamentoThreads()
 {
   for (int x = 0; x < QTDCLIENTE; x++)
     pthread_join(cliente[x].thread, NULL);
 
   for (int x = 0; x < QTDREPOSITOR; x++)
-    pthread_join(repositores[x].thread, NULL);
+    pthread_cancel(repositores[x].thread);
 }
