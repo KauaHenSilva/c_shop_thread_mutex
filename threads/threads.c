@@ -38,20 +38,26 @@ struct produto
 {
   int idProduto;
   int qtdProduto;
+  char nomeProduto[50];
+  float valor;
+  int qtdComprados;
   pthread_mutex_t product;
 };
 
 struct cliente
 {
   pthread_t thread;
+  char nome[50];
   int id;
 };
 
 struct repositores
 {
   pthread_t thread;
+  char nome[50];
   int id;
 };
+
 
 #endif // STRUCTPRODUTOCLIENTEREPOSITORIO
 
@@ -81,10 +87,13 @@ void *run_client(void *positionCliente)
     if (produto[idxProduto].qtdProduto > 0)
     {
       produto[idxProduto].qtdProduto--;
+      
       printf("%s, comprou o produto %s, sobrou %02d itens. \n",
              cliente[*idCliente].nome,
              produto[idxProduto].nomeProduto,
              produto[idxProduto].qtdProduto);
+
+      produto[idxProduto].qtdComprados++;
     }
 #ifdef EXIBIR_COMPRAS_FALHAS
     else

@@ -1,4 +1,5 @@
 #include "definicoes.h"
+#include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -26,6 +27,8 @@ struct produto
   int idProduto;
   int qtdProduto;
   char nomeProduto[50];
+  float valor;
+  int qtdComprados;
   pthread_mutex_t product;
 };
 
@@ -80,7 +83,8 @@ void defProdutos()
   {
     produto[x].idProduto = ++idProduto;
     produto[x].qtdProduto = QUANTIDADE_INICIAL_REPOSICAO;
-    fscanf(arqProdutos, "%s", produto[x].nomeProduto);
+    produto[x].qtdComprados = 0;
+    fscanf(arqProdutos, "%s %f", produto[x].nomeProduto, &produto[x].valor);
     subtituiCaracter(produto[x].nomeProduto, '_', ' ');
     pthread_mutex_init(&produto[x].product, NULL);
   }

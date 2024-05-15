@@ -36,6 +36,18 @@
 #include "defincoes/definicoes.c"
 #include "threads/threads.c"
 
+void exibirRelatiorioProdutos()
+{
+  float total;
+  for(int x = 0 ; x < QTDPRODUTO ; x++)
+  {
+    printf("O total de %s comprados foi de %d\n", produto[x].nomeProduto, produto[x].qtdComprados);
+    total += produto[x].qtdComprados * produto[x].valor;
+  }
+
+  printf("O total de vendas foi de %.2f\n", total);
+
+}
 int main()
 {
   defProdutos();
@@ -47,6 +59,9 @@ int main()
   runThreadVerificarMercado();
 
   finalizamentoThreads();
+
+
+  exibirRelatiorioProdutos();
 
   freeProdutos();
   freeCliente();
