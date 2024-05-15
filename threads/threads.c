@@ -3,6 +3,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
+
+pthread_mutex_t print = PTHREAD_MUTEX_INITIALIZER;
 
 #ifndef TEMPO_MEDIO_DE_UMA_COMPRA
 #define TEMPO_MEDIO_DE_UMA_COMPRA 0
@@ -35,17 +38,23 @@ struct produto
 {
   int idProduto;
   int qtdProduto;
+  char nomeProduto[50];
+  float valor;
+  int qtdComprados;
+  pthread_mutex_t product;
 };
 
 struct cliente
 {
   pthread_t thread;
+  char nome[50];
   int id;
 };
 
 struct repositores
 {
   pthread_t thread;
+  char nome[50];
   int id;
 };
 
@@ -66,11 +75,10 @@ void *run_client(void *positionCliente)
   int *idCliente = (int *)positionCliente;
 
   int idxProduto;
-  int qtdCompras = rand() % 100 + 10;
+  int qtdCompras = rand() % 10 + 10;
 
   while (qtdCompras)
   {
-    sleep(TEMPO_MEDIO_DE_UMA_COMPRA);
     idxProduto = rand() % QTDPRODUTO;
 
     pthread_mutex_lock(&produto[idxProduto].product);
@@ -78,24 +86,30 @@ void *run_client(void *positionCliente)
     if (produto[idxProduto].qtdProduto > 0)
     {
       produto[idxProduto].qtdProduto--;
-      printf("O cliente %02d, ", cliente[*idCliente].id);
-      printf("comprou o produto %02d, ", produto[idxProduto].idProduto);
-      printf("sobrou %02d. \n", produto[idxProduto].qtdProduto);
+
+      printf("%s, comprou o produto %s, sobrou %02d itens. \n",
+             cliente[*idCliente].nome,
+             produto[idxProduto].nomeProduto,
+             produto[idxProduto].qtdProduto);
+
+      produto[idxProduto].qtdComprados++;
     }
 #ifdef EXIBIR_COMPRAS_FALHAS
     else
     {
-      printf("O cliente %02d, ", cliente[*idCliente].id);
-      printf("comprou o produto %02d, ", produto[idxProduto].idProduto);
-      printf("sobrou %02d. (Falha em comprar, Nao possuia na platileira)\n", produto[idxProduto].qtdProduto);
+      printf("%s, comprou o produto %s, sobrou %02d. (Falha em comprar, Nao possuia na platileira)\n",
+             cliente[*idCliente].nome,
+             produto[idxProduto].nomeProduto,
+             produto[idxProduto].qtdProduto);
     }
 #endif
 
     pthread_mutex_unlock(&produto[idxProduto].product);
     qtdCompras--;
+    sleep(TEMPO_MEDIO_DE_UMA_COMPRA);
   }
 
-  printf("O cliente %2d, arrasta para cima!\n", cliente[*idCliente].id);
+  printf("%s foi de arrasta para cima!\n", cliente[*idCliente].nome);
 
   free(idCliente);
   return NULL;
@@ -104,27 +118,26 @@ void *run_client(void *positionCliente)
 void *run_Repositore(void *positionRepostor)
 {
   int *idRepositor = (int *)positionRepostor;
-  int qtdReposicao = rand() % 100 + 10;
+  int posicao;
 
-  int posicao = rand() % QTDPRODUTO;
-
-  while (qtdReposicao)
+  while (1)
   {
-    for (; posicao < QTDPRODUTO; posicao++)
-    {
-      pthread_mutex_lock(&produto[posicao].product);
-      if (produto[posicao].qtdProduto < QUANTIDADE_POR_REPOSICAO)
-      {
-        sleep(TEMPO_MEDIO_DE_UMA_REPOSCAO);
+    posicao = rand() % QTDPRODUTO;
+    pthread_mutex_lock(&produto[posicao].product);
 
-        produto[posicao].qtdProduto += QUANTIDADE_POR_REPOSICAO;
-        printf("O Repistor nmr %02d, ", repositores[*idRepositor].id);
-        printf("repos %02d item ", QUANTIDADE_POR_REPOSICAO);
-        printf("do produto %02d. \n", produto[posicao].idProduto);
-      }
-      pthread_mutex_unlock(&produto[posicao].product);
+    if (produto[posicao].qtdProduto < QUANTIDADE_POR_REPOSICAO)
+    {
+      produto[posicao].qtdProduto += QUANTIDADE_POR_REPOSICAO;
+
+      printf("O Repistor %s, repos %02d itens do produto %s, agora tem %02d. \n",
+             repositores[*idRepositor].nome,
+             QUANTIDADE_POR_REPOSICAO,
+             produto[posicao].nomeProduto,
+             produto[posicao].qtdProduto);
     }
-    posicao = 0;
+
+    pthread_mutex_unlock(&produto[posicao].product);
+    sleep(TEMPO_MEDIO_DE_UMA_REPOSCAO);
   }
 
   return NULL;
@@ -140,7 +153,7 @@ void *run_verificarMercado(void *arg)
     for (int x = 0; x < QTDPRODUTO; x++)
     {
       pthread_mutex_lock(&produto[x].product);
-      if (produto[x].qtdProduto == 0)
+      if (produto[x].qtdProduto > 0)
         qtdProduto++;
       pthread_mutex_unlock(&produto[x].product);
     }
@@ -189,4 +202,13 @@ void runThreadVerificarMercado()
   pthread_t thread;
   if (pthread_create(&thread, NULL, &run_verificarMercado, NULL) != 0)
     perror("Erro a criar");
+}
+
+void finalizamentoThreads()
+{
+  for (int x = 0; x < QTDCLIENTE; x++)
+    pthread_join(cliente[x].thread, NULL);
+
+  for (int x = 0; x < QTDREPOSITOR; x++)
+    pthread_cancel(repositores[x].thread);
 }

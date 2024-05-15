@@ -14,29 +14,40 @@
 #endif
 
 #ifndef QUANTIDADE_POR_REPOSICAO
-#define QUANTIDADE_POR_REPOSICAO 20
+#define QUANTIDADE_POR_REPOSICAO 5
 #endif
 
 #ifndef QUANTIDADE_INICIAL_REPOSICAO
-#define QUANTIDADE_INICIAL_REPOSICAO 0
+#define QUANTIDADE_INICIAL_REPOSICAO 10
 #endif
 
 #ifndef QTDPRODUTO
-#define QTDPRODUTO 50
+#define QTDPRODUTO 12
 #endif
 
 #ifndef QTDCLIENTE
-#define QTDCLIENTE 10
+#define QTDCLIENTE 7
 #endif
 
 #ifndef QTDREPOSITOR
-#define QTDREPOSITOR 10
+#define QTDREPOSITOR 4
 #endif
 
 #include "defincoes/definicoes.c"
 #include "threads/threads.c"
 
+void exibirRelatiorioProdutos()
+{
+  float total;
+  for(int x = 0 ; x < QTDPRODUTO ; x++)
+  {
+    printf("O total de %s comprados foi de %d\n", produto[x].nomeProduto, produto[x].qtdComprados);
+    total += produto[x].qtdComprados * produto[x].valor;
+  }
 
+  printf("O total de vendas foi de %.2f\n", total);
+
+}
 int main()
 {
   defProdutos();
@@ -47,8 +58,9 @@ int main()
   runThreadRepositor();
   runThreadVerificarMercado();
 
-  while(1)
-    continue;
+  finalizamentoThreads();
+
+  exibirRelatiorioProdutos();
 
   freeProdutos();
   freeCliente();
